@@ -56,7 +56,11 @@ class JUnit4Runner(clazz: Class[Suite]) extends Runner {
 
     override def testFailed(report: Report) {
       val desc = Description.createTestDescription(clazz, report.name)
-      notifier.fireTestFailure(new Failure(desc, report.throwable.get))
+      val throwable = report.throwable.get
+	  val assertion = if (throwable.isInstanceOf[TestFailedException])
+	                    new AssertionError(throwable.getMessage, throwable)
+	                  else throwable
+      notifier.fireTestFailure(new Failure(desc, assertion))
       notifier.fireTestFinished(desc)
     }
 

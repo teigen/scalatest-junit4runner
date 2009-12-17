@@ -3,7 +3,7 @@ package com.jteigen.scalatest
 import org.junit.runner.{RunWith, JUnitCore}
 import org.junit.Test
 import org.junit.Assert.assertEquals
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.matchers.{ShouldMatchers, MustMatchers}
 import org.scalatest.{FunSuite, Spec}
 
 object SuitesAndSpecs {
@@ -38,15 +38,29 @@ object SuitesAndSpecs {
       }
     }
   }
+
+  @RunWith(classOf[JUnit4Runner])
+  class ZazTest extends Spec with MustMatchers {
+    describe("The test") {
+      it("should succeed") { assert(1 == 1) }
+
+      it ("should fail while using assert") { assert(1 == 2) }
+
+      it ("should fail while using must") { 1 must be(2) }
+
+      it ("should error with unexpected error") { throw new RuntimeException() }
+    }
+  }
 }
+
 class JUnit4RunnerTest {
   import SuitesAndSpecs._
 
   @Test
   def runWithJunit {
-    val result = JUnitCore.runClasses(classOf[SomeFunSuite], classOf[SomeSpec])
-    assertEquals(4, result.getRunCount)
+    val result = JUnitCore.runClasses(classOf[SomeFunSuite], classOf[SomeSpec], classOf[ZazTest])
+    assertEquals(8, result.getRunCount)
     assertEquals(2, result.getIgnoreCount)
-    assertEquals(2, result.getFailureCount)
+    assertEquals(5, result.getFailureCount)
   }
 }
